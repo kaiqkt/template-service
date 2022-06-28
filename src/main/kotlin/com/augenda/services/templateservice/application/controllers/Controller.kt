@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController
 class Controller : HelloworldApi {
 
     override fun helloWorld(): ResponseEntity<String> {
-        return ResponseEntity("Hello World", HttpStatus.OK)
+        return ResponseEntity("Hi mom", HttpStatus.OK)
     }
 }
