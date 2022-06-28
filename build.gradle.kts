@@ -4,12 +4,13 @@ val mainPkgAndClass = "com.augenda.services.templateservice.TemplateServiceAppli
 
 val excludePackages: List<String> by extra {
 	listOf(
-		"com/augenda/services/templateserviceapplication/dto/**",
-		"com/augenda/services/templateservicecommons/ext/**",
+		"com/augenda/services/templateservice/application/**",
+		"com/augenda/services/templateservice/commons/ext/**",
 		"com/augenda/services/templateservice/TemplateServiceApplication*"
 	)
 }
 
+@Suppress("UNCHECKED_CAST")
 fun ignorePackagesForReport(jacocoBase: JacocoReportBase) {
 	jacocoBase.classDirectories.setFrom(
 		sourceSets.main.get().output.asFileTree.matching {
@@ -33,6 +34,7 @@ plugins {
 	id("org.springframework.boot") version "2.7.1"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("io.gitlab.arturbosch.detekt") version "1.19.0"
+	id("org.openapi.generator") version "5.1.1"
 	id("jacoco")
 }
 
@@ -43,15 +45,28 @@ dependencies {
 
 	//spring
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 
 	//jackson
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.ninja-squad:springmockk:3.1.1")
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(module = "mockito-core")
+	}
 }
 
 application {
-	mainClassName = mainPkgAndClass
+	mainClass.set(mainPkgAndClass)
+}
+
+java.sourceSets["main"].java.srcDir("$buildDir/generated/src/main/kotlin")
+
+openApiGenerate {
+	generatorName.set("kotlin-spring")
+	inputSpec.set("$rootDir/src/main/resources/api-docs.yml")
+	outputDir.set("$buildDir/generated/")
+	configFile.set("$rootDir/src/main/resources/api-config.json")
 }
 
 tasks.withType<KotlinCompile> {
@@ -64,7 +79,7 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
-tasks.withType<CreateStartScripts> { mainClassName = mainPkgAndClass }
+tasks.withType<CreateStartScripts> { mainClass.set(mainPkgAndClass) }
 
 tasks.jar {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -93,8 +108,8 @@ jacoco {
 
 tasks.withType<JacocoReport> {
 	reports {
-		xml.isEnabled = true
-		html.isEnabled = true
+		xml.required
+		html.required
 		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 	}
 	ignorePackagesForReport(this)

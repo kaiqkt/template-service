@@ -8,5 +8,4 @@ class TemplateServiceApplication
 
 fun main(args: Array<String>) {
 	runApplication<TemplateServiceApplication>(*args)
-	println("Hello World")
 }

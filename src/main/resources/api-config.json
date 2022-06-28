@@ -1,0 +1,10 @@
+{
+  "apiPackage": "com.augenda.services.templateservice.application.controllers",
+  "modelPackage": "com.augenda.services.templateservice.application.dto",
+  "dateLibrary": "java8",
+  "useBeanValidation": true,
+  "interfaceOnly": true,
+  "hideGenerationTimestamp": true,
+  "serviceInterface": false,
+  "openApiNullable": false
+}
