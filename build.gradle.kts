@@ -23,6 +23,10 @@ group = "com.augenda.services"
 version = "1.0.0"
 description = "Spring boot application template"
 
+application {
+	mainClass.set(mainPkgAndClass)
+}
+
 repositories {
 	mavenCentral()
 }
@@ -37,6 +41,29 @@ plugins {
 	id("org.openapi.generator") version "5.1.1"
 	id("jacoco")
 }
+
+jacoco {
+	toolVersion = "0.8.7"
+	reportsDirectory.set(layout.buildDirectory.dir("jacoco"))
+}
+
+detekt {
+	source = files("src/main/java", "src/main/kotlin")
+	config = files("detekt/detekt.yml")
+}
+
+sourceSets {
+	create("componentTest") {
+		compileClasspath += sourceSets.main.get().output
+		runtimeClasspath += sourceSets.main.get().output
+	}
+}
+
+val componentTestImplementation: Configuration by configurations.getting {
+	extendsFrom(configurations.implementation.get())
+}
+
+configurations["componentTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 dependencies {
 	//kotlin
@@ -54,10 +81,11 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(module = "mockito-core")
 	}
-}
 
-application {
-	mainClass.set(mainPkgAndClass)
+	componentTestImplementation("org.junit.jupiter:junit-jupiter")
+	componentTestImplementation("io.rest-assured:kotlin-extensions:4.3.0")
+	componentTestImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.0.0")
+	componentTestImplementation(sourceSets["test"].output)
 }
 
 java.sourceSets["main"].java.srcDir("$buildDir/generated/src/main/kotlin")
@@ -92,18 +120,18 @@ tasks.jar {
 	from(sourceSets.main.get().output)
 }
 
-detekt {
-	source = files("src/main/java", "src/main/kotlin")
-	config = files("detekt/detekt.yml")
-}
-
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-jacoco {
-	toolVersion = "0.8.7"
-	reportsDirectory.set(layout.buildDirectory.dir("jacoco"))
+val componentTestTask = tasks.create("componentTest", Test::class) {
+	description = "Runs the component tests."
+	group = "verification"
+
+	testClassesDirs = sourceSets["componentTest"].output.classesDirs
+	classpath = sourceSets["componentTest"].runtimeClasspath
+
+	useJUnitPlatform()
 }
 
 tasks.withType<JacocoReport> {
@@ -132,7 +160,7 @@ tasks.withType<JacocoCoverageVerification> {
 }
 
 tasks.test {
-	finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
+	finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification, componentTestTask)
 }
 
 tasks.jacocoTestReport {
