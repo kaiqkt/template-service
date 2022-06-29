@@ -10,6 +10,6 @@ class ControllerTest {
     fun `given request return hello world and status 200`() {
         val response = controller.helloWorld()
 
-        Assertions.assertEquals("Hello World", response.body)
+        Assertions.assertEquals("Hi mom", response.body)
     }
 }

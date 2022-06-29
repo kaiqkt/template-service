@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val mainPkgAndClass = "com.augenda.services.templateservice.TemplateServiceApplication"
+val mainPkgAndClass = "com.augenda.services.templateservice.TemplateServiceApplicationKt"
 
 val excludePackages: List<String> by extra {
 	listOf(
@@ -78,7 +78,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	testImplementation("com.ninja-squad:springmockk:3.1.1")
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+	testImplementation( "org.springframework.boot:spring-boot-starter-test") {
 		exclude(module = "mockito-core")
 	}
 
@@ -96,6 +96,8 @@ openApiGenerate {
 	outputDir.set("$buildDir/generated/")
 	configFile.set("$rootDir/src/main/resources/api-config.json")
 }
+
+// tasks
 
 tasks.withType<KotlinCompile> {
 	sourceCompatibility = JavaVersion.VERSION_1_8.name
