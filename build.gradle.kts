@@ -6,6 +6,7 @@ val excludePackages: List<String> by extra {
 	listOf(
 		"com/augenda/services/templateservice/application/**",
 		"com/augenda/services/templateservice/commons/ext/**",
+		"com/augenda/services/templateservice/resources/configs/**",
 		"com/augenda/services/templateservice/TemplateServiceApplication*"
 	)
 }
@@ -73,6 +74,8 @@ dependencies {
 	//spring
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("io.springfox:springfox-swagger-ui:3.0.0")
+	implementation("io.springfox:springfox-boot-starter:3.0.0")
 
 	//jackson
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -83,8 +86,6 @@ dependencies {
 	}
 
 	componentTestImplementation("org.junit.jupiter:junit-jupiter")
-	componentTestImplementation("io.rest-assured:kotlin-extensions:4.3.0")
-	componentTestImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.0.0")
 	componentTestImplementation(sourceSets["test"].output)
 }
 
@@ -92,9 +93,9 @@ java.sourceSets["main"].java.srcDir("$buildDir/generated/src/main/kotlin")
 
 openApiGenerate {
 	generatorName.set("kotlin-spring")
-	inputSpec.set("$rootDir/src/main/resources/api-docs.yml")
+	inputSpec.set("$rootDir/src/main/resources/static/api-docs.yml")
 	outputDir.set("$buildDir/generated/")
-	configFile.set("$rootDir/src/main/resources/api-config.json")
+	configFile.set("$rootDir/src/main/resources/static/api-config.json")
 }
 
 // tasks

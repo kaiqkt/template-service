@@ -1,5 +1,11 @@
+server:
+  port: 8080
+---
 spring:
   application:
     name: template-service
-  server:
-port: 8080
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+open-api:
+  location: /api-docs.yml
